@@ -1,0 +1,17 @@
+# Install Kaggle API
+!pip install kaggle
+
+# Upload your kaggle.json API key (get from https://www.kaggle.com/account)
+from google.colab import files
+files.upload()  # Upload kaggle.json here
+
+# Move kaggle.json to correct folder
+!mkdir -p ~/.kaggle
+!mv kaggle.json ~/.kaggle/
+!chmod 600 ~/.kaggle/kaggle.json
+
+# Download dataset
+!kaggle datasets download -d techsash/waste-classification-data
+
+# Unzip dataset
+!unzip waste-classification-data.zip
