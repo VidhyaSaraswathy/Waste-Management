@@ -2,7 +2,7 @@ import streamlit as st
 from PIL import Image
 import numpy as np
 import pickle
-import cv2
+
 
 # Load your pre-trained classical ML model (SVM, RandomForest, etc.)
 model = pickle.load(open("model.pkl", "rb"))
@@ -39,3 +39,4 @@ if uploaded_file:
     label = classes[prediction[0]]
     
     st.write(f"**Predicted Waste Type:** {label}")
+
