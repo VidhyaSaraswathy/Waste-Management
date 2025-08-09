@@ -1,25 +1,31 @@
+app_code = 
 import streamlit as st
-from PIL import Image
+import tensorflow as tf
 import numpy as np
+from PIL import Image
 
-st.title("Waste Management Classifier (Demo)")
+model = tf.keras.models.load_model("waste_classifier.h5")
+classes = ['cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash']
 
-uploaded_file = st.file_uploader("Upload an image of waste", type=["jpg", "jpeg", "png"])
+st.title("♻️ Waste Classification App")
+st.write("Upload an image to classify waste type")
 
-if uploaded_file is not None:
-    # Open image
-    image = Image.open(uploaded_file)
-    st.image(image, caption='Uploaded Image', use_column_width=True)
-    
-    # Dummy prediction logic: classify based on average color
-    img_array = np.array(image.resize((50, 50)))  # resize for speed
-    
-    avg_color = img_array.mean(axis=(0, 1))
-    
-    # Simple rule: more green-ish = recyclable, else non-recyclable (just example)
-    if avg_color[1] > avg_color[0] and avg_color[1] > avg_color[2]:
-        prediction = "Recyclable Waste ♻️"
-    else:
-        prediction = "Non-Recyclable Waste 🚮"
-    
-    st.write(f"**Prediction:** {prediction}")
+uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
+
+if uploaded_file:
+    img = Image.open(uploaded_file).resize((224,224))
+    st.image(img, caption="Uploaded Image", use_container_width=True)
+
+    img_array = np.array(img)/255.0
+    img_array = np.expand_dims(img_array, axis=0)
+
+    prediction = model.predict(img_array)
+    label = classes[np.argmax(prediction)]
+
+    st.write(f"**Predicted Waste Type:** {label}")
+
+
+with open("app.py", "w") as f:
+    f.write(app_code)
+
+print("Streamlit app script 'app.py' created.")
