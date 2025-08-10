@@ -1,41 +1,30 @@
 import streamlit as st
 from PIL import Image
 import numpy as np
-import pickle
-import cv2
 
-# Load your pre-trained classical ML model (SVM, RandomForest, etc.)
-model = pickle.load(open("model.pkl", "rb"))
+# Dummy predict function without TensorFlow
+def dummy_predict(img_array):
+    # Simple dummy logic: if average pixel brightness > 0.5, predict recyclable
+    brightness = np.mean(img_array)
+    if brightness > 0.5:
+        return 1  # Recyclable
+    else:
+        return 0  # Non-Recyclable
 
-# Define class labels
-classes = ['cardboard', 'glass', 'metal', 'paper', 'plastic', 'trash']
+classes = ['Non-Recyclable', 'Recyclable']
 
 st.title("♻️ Waste Classification App (No TensorFlow)")
 
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
 
-def extract_features(img):
-    # Convert PIL image to OpenCV format
-    img = np.array(img)
-    if img.shape[-1] == 4:
-        img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB)
-    # Resize for consistency
-    img = cv2.resize(img, (100, 100))
-    # Calculate color histogram for each channel
-    features = []
-    for i in range(3):  # RGB channels
-        hist = cv2.calcHist([img], [i], None, [32], [0, 256])
-        hist = cv2.normalize(hist, hist).flatten()
-        features.extend(hist)
-    return np.array(features)
-
 if uploaded_file:
-    img = Image.open(uploaded_file)
+    img = Image.open(uploaded_file).resize((224, 224))
     st.image(img, caption="Uploaded Image", use_container_width=True)
-    
-    # Extract features and predict
-    features = extract_features(img).reshape(1, -1)
-    prediction = model.predict(features)
-    label = classes[prediction[0]]
-    
-    st.write(f"**Predicted Waste Type:** {label}")
+
+    img_array = np.array(img) / 255.0
+    img_array = img_array.astype(np.float32)
+
+    prediction = dummy_predict(img_array)
+    predicted_label = classes[prediction]
+
+    st.write(f"**Predicted Waste Type:** {predicted_label}")
